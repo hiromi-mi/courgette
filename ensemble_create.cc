@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "base/logging.h"
-#include "base/time/time.h"
+//#include "base/time/time.h"
 
 #include "courgette/crc.h"
 #include "courgette/difference_estimator.h"
@@ -132,11 +132,11 @@ bool UnsafeDifference(Element* old_element, Element* new_element) {
 //
 Status FindGenerators(Ensemble* old_ensemble, Ensemble* new_ensemble,
                       std::vector<TransformationPatchGenerator*>* generators) {
-  base::Time start_find_time = base::Time::Now();
+  //base::Time start_find_time = base::Time::Now();
   old_ensemble->FindEmbeddedElements();
   new_ensemble->FindEmbeddedElements();
-  VLOG(1) << "done FindEmbeddedElements "
-          << (base::Time::Now() - start_find_time).InSecondsF();
+  VLOG(1) << "done FindEmbeddedElements ";
+          //<< (base::Time::Now() - start_find_time).InSecondsF();
 
   std::vector<Element*> old_elements(old_ensemble->elements());
   std::vector<Element*> new_elements(new_ensemble->elements());
@@ -147,13 +147,13 @@ Status FindGenerators(Ensemble* old_ensemble, Ensemble* new_ensemble,
   DifferenceEstimator difference_estimator;
   std::vector<DifferenceEstimator::Base*> bases;
 
-  base::Time start_bases_time = base::Time::Now();
+  //base::Time start_bases_time = base::Time::Now();
   for (size_t i = 0;  i < old_elements.size();  ++i) {
     bases.push_back(
         difference_estimator.MakeBase(old_elements[i]->region()));
   }
-  VLOG(1) << "done make bases "
-          << (base::Time::Now() - start_bases_time).InSecondsF() << "s";
+  VLOG(1) << "done make bases ";
+          //<< (base::Time::Now() - start_bases_time).InSecondsF() << "s";
 
   for (size_t new_index = 0;  new_index < new_elements.size();  ++new_index) {
     Element* new_element = new_elements[new_index];
@@ -182,14 +182,14 @@ Status FindGenerators(Ensemble* old_ensemble, Ensemble* new_ensemble,
       if (UnsafeDifference(old_element, new_element))
         continue;
 
-      base::Time start_compare = base::Time::Now();
+      //base::Time start_compare = base::Time::Now();
       DifferenceEstimator::Base* old_base = bases[old_index];
       size_t difference = difference_estimator.Measure(old_base, new_subject);
 
       VLOG(1) << "Compare " << old_element->Name()
               << " to " << new_element->Name()
               << " --> " << difference
-              << " in " << (base::Time::Now() - start_compare).InSecondsF()
+              //<< " in " << (base::Time::Now() - start_compare).InSecondsF()
               << "s";
       if (difference == 0) {
         VLOG(1) << "Skip " << new_element->Name()
@@ -216,7 +216,7 @@ Status FindGenerators(Ensemble* old_ensemble, Ensemble* new_ensemble,
   }
 
   VLOG(1) << "done FindGenerators found " << generators->size()
-          << " in " << (base::Time::Now() - start_find_time).InSecondsF()
+          //<< " in " << (base::Time::Now() - start_find_time).InSecondsF()
           << "s";
 
   return C_OK;
@@ -235,7 +235,7 @@ Status GenerateEnsemblePatch(SourceStream* base,
                              SourceStream* update,
                              SinkStream* final_patch) {
   VLOG(1) << "start GenerateEnsemblePatch";
-  base::Time start_time = base::Time::Now();
+  //base::Time start_time = base::Time::Now();
 
   Region old_region(base->Buffer(), base->Remaining());
   Region new_region(update->Buffer(), update->Remaining());
@@ -437,8 +437,8 @@ Status GenerateEnsemblePatch(SourceStream* base,
     return C_STREAM_ERROR;
   }
 
-  VLOG(1) << "done GenerateEnsemblePatch "
-          << (base::Time::Now() - start_time).InSecondsF() << "s";
+  VLOG(1) << "done GenerateEnsemblePatch ";
+          //<< (base::Time::Now() - start_time).InSecondsF() << "s";
 
   return C_OK;
 }

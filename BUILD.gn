@@ -2,8 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/compiler/compiler.gni")
-import("//testing/test.gni")
+#import("//build/config/compiler/compiler.gni")
+import("//mini_chromium/build/compiler.gni")
+#import("//testing/test.gni")
 
 static_library("courgette_lib") {
   sources = [
@@ -57,7 +58,7 @@ static_library("courgette_lib") {
   ]
 
   deps = [
-    "//base",
+    "//mini_chromium/base",
     "//third_party/lzma_sdk",
   ]
 
@@ -65,7 +66,13 @@ static_library("courgette_lib") {
     ":bsdiff",
     ":courgette_common",
   ]
+  public_configs = [ "//build:mini_chromium_config" ]
 }
+
+config("minichromium_courgette_config") {
+  include_dirs = [ "//mini_chromium/" ]
+}
+
 
 source_set("courgette_common") {
   sources = [
@@ -78,14 +85,16 @@ source_set("courgette_common") {
     "streams.h",
   ]
   deps = [
-    "//base",
+    "//mini_chromium/base",
     "//third_party/lzma_sdk",
   ]
+  public_configs = [ "//build:mini_chromium_config" ]
 }
 
 source_set("paged_array") {
   sources = [ "third_party/bsdiff/paged_array.h" ]
-  deps = [ "//base" ]
+  deps = [ "//mini_chromium/base" ]
+  public_configs = [ "//build:mini_chromium_config", ":minichromium_courgette_config" ]
 }
 
 source_set("bsdiff") {
@@ -97,12 +106,13 @@ source_set("bsdiff") {
   ]
   deps = [
     ":courgette_common",
-    "//base",
+    "//mini_chromium/base",
   ]
   public_deps = [
     ":divsufsort",
     ":paged_array",
   ]
+  public_configs = [ "//build:mini_chromium_config", ":minichromium_courgette_config" ]
 }
 
 source_set("divsufsort") {
@@ -116,28 +126,29 @@ source_set("divsufsort") {
   deps = [
     ":courgette_common",
     ":paged_array",
-    "//base",
+    "//mini_chromium/base",
   ]
-  configs += [ "//build/config/compiler:no_shorten_64_warnings" ]
+  public_configs = [ "//build:mini_chromium_config", ":minichromium_courgette_config" ]
 }
 
-if (!is_ios) {
+if (!mini_chromium_is_ios) {
   executable("courgette") {
-    if (is_win && current_cpu == "x64") {
+    if (mini_chromium_is_win && current_cpu == "x64") {
       # The build infrastructure needs courgette to be named courgette64.
       output_name = "courgette64"
     }
 
     sources = [ "courgette_tool.cc" ]
 
-    if (is_win) {
+    if (mini_chromium_is_win) {
       ldflags = [ "/LARGEADDRESSAWARE" ]
     }
 
     deps = [
       ":courgette_lib",
-      "//base",
-      "//build/win:default_exe_manifest",
+      "//mini_chromium/base",
+      # windows is not avallibalbe yet
+      #"//build/win:default_exe_manifest",
     ]
   }
 
@@ -146,12 +157,13 @@ if (!is_ios) {
 
     deps = [
       ":courgette_lib",
-      "//base",
-      "//build/win:default_exe_manifest",
+      "//mini_chromium/base",
+      #"//build/win:default_exe_manifest",
     ]
+    public_configs = [ "//build:mini_chromium_config", ":minichromium_courgette_config" ]
   }
 
-  if (is_win) {
+  if (mini_chromium_is_win) {
     if (current_cpu == "x64") {
       # TODO(sebmarchand): The official build scripts expect courgette.exe to be
       # in the official build archives, remove this once they have been updated.
@@ -164,11 +176,12 @@ if (!is_ios) {
     } else {
       # Make sure that we have a copy of courgette64.exe(.pdb) in the root out
       # directory.
-      if (is_clang) {
-        courgette64_toolchain = "//build/toolchain/win:win_clang_x64"
-      } else {
+      # TODO not supported is_clang with mini_chromium
+      #if (is_clang) {
+      #  courgette64_toolchain = "//build/toolchain/win:win_clang_x64"
+      #} else {
         courgette64_toolchain = "//build/toolchain/win:x64"
-      }
+      #}
       courgette64_label = ":courgette($courgette64_toolchain)"
 
       courgette64_out_dir = get_label_info(courgette64_label, "root_out_dir")
@@ -194,59 +207,4 @@ if (!is_ios) {
   }
 }
 
-test("courgette_unittests") {
-  sources = [
-    "adjustment_method_unittest.cc",
-    "base_test_unittest.cc",
-    "base_test_unittest.h",
-    "bsdiff_memory_unittest.cc",
-    "consecutive_range_visitor_unittest.cc",
-    "difference_estimator_unittest.cc",
-    "disassembler_elf_32_x86_unittest.cc",
-    "disassembler_win32_x64_unittest.cc",
-    "disassembler_win32_x86_unittest.cc",
-    "encode_decode_unittest.cc",
-    "encoded_program_unittest.cc",
-    "ensemble_unittest.cc",
-    "image_utils_unittest.cc",
-    "label_manager_unittest.cc",
-    "memory_allocator_unittest.cc",
-    "program_detector_unittest.cc",
-    "rel32_finder_unittest.cc",
-    "streams_unittest.cc",
-    "third_party/bsdiff/bsdiff_search_unittest.cc",
-    "third_party/bsdiff/paged_array_unittest.cc",
-    "third_party/divsufsort/divsufsort_unittest.cc",
-    "typedrva_unittest.cc",
-    "versioning_unittest.cc",
-  ]
 
-  # TODO(jschuh): crbug.com/167187 fix size_t to int truncations.
-  configs += [ "//build/config/compiler:no_size_t_to_int_warning" ]
-
-  deps = [
-    ":courgette_lib",
-    "//base",
-    "//base:i18n",
-    "//base/test:run_all_unittests",
-    "//base/test:test_support",
-    "//testing/gtest",
-  ]
-
-  data = [ "testdata/" ]
-}
-
-test("courgette_fuzz") {
-  sources = [
-    "base_test_unittest.cc",
-    "base_test_unittest.h",
-    "encoded_program_fuzz_unittest.cc",
-  ]
-  deps = [
-    ":courgette_lib",
-    "//base",
-    "//base:i18n",
-    "//base/test:test_support",
-    "//testing/gtest",
-  ]
-}

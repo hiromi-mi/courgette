@@ -11,7 +11,7 @@
 #include <map>
 #include <vector>
 
-#include "base/gtest_prod_util.h"
+//#include "base/gtest_prod_util.h"
 #include "base/macros.h"
 #include "courgette/image_utils.h"
 
@@ -109,8 +109,10 @@ class LabelManager {
   void Read(RvaVisitor* rva_visitor);
 
  protected:
+  /*
   FRIEND_TEST_ALL_PREFIXES(LabelManagerTest, TrivialAssign);
   FRIEND_TEST_ALL_PREFIXES(LabelManagerTest, AssignRemainingIndexes);
+  */
 
   // The main list of Label instances, sorted by the |rva_| member.
   LabelVector labels_;

@@ -429,8 +429,10 @@ Status ApplyEnsemblePatch(const base::FilePath::CharType* old_file_name,
                  base::File::FLAG_CREATE_ALWAYS | base::File::FLAG_WRITE |
                      base::File::FLAG_EXCLUSIVE_WRITE |
                      base::File::FLAG_SHARE_DELETE));
+  /*
   if (result != C_OK)
     base::DeleteFile(base::FilePath(new_file_name));
+    */
   return result;
 }
 

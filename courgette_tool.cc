@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "base/at_exit.h"
+//#include "base/at_exit.h"
 #include "base/command_line.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
@@ -256,8 +256,8 @@ void DisassembleAdjustDiff(const base::FilePath& old_file,
 
     std::string append = std::string("-") + base::NumberToString(i);
 
-    WriteSinkToFile(&patch_stream,
-                    output_file_root.InsertBeforeExtensionASCII(append));
+// edit
+    WriteSinkToFile(&patch_stream, output_file_root.BaseName().Append(append));
   }
 }
 
@@ -394,9 +394,12 @@ void ApplyBSDiffPatch(const base::FilePath& old_file,
 }  // namespace
 
 int main(int argc, const char* argv[]) {
-  base::AtExitManager at_exit_manager;
+// edit
+  //base::AtExitManager at_exit_manager;
   base::CommandLine::Init(argc, argv);
-  const base::CommandLine& command_line =
+  base::CommandLine& command_line =
+// edit
+  //const base::CommandLine& command_line =
       *base::CommandLine::ForCurrentProcess();
 
   logging::LoggingSettings settings;
@@ -405,10 +408,10 @@ int main(int argc, const char* argv[]) {
         logging::LOG_TO_SYSTEM_DEBUG_LOG | logging::LOG_TO_STDERR;
   } else {
     settings.logging_dest = logging::LOG_TO_ALL;
-    settings.log_file_path = FILE_PATH_LITERAL("courgette.log");
+    //settings.log_file_path = FILE_PATH_LITERAL("courgette.log");
   }
   (void)logging::InitLogging(settings);
-  logging::SetMinLogLevel(logging::LOG_VERBOSE);
+  //logging::SetMinLogLevel(logging::LOG_VERBOSE);
 
   bool cmd_sup = command_line.HasSwitch("supported");
   bool cmd_dis = command_line.HasSwitch("dis");

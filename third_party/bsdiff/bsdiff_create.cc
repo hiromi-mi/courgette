@@ -60,7 +60,7 @@
 
 #include "base/logging.h"
 #include "base/strings/string_util.h"
-#include "base/time/time.h"
+//#include "base/time/time.h"
 
 #include "courgette/crc.h"
 #include "courgette/streams.h"
@@ -92,7 +92,7 @@ static CheckBool WriteHeader(SinkStream* stream, MBSPatchHeader* header) {
 BSDiffStatus CreateBinaryPatch(SourceStream* old_stream,
                                SourceStream* new_stream,
                                SinkStream* patch_stream) {
-  base::Time start_bsdiff_time = base::Time::Now();
+  //base::Time start_bsdiff_time = base::Time::Now();
   VLOG(1) << "Start bsdiff";
   size_t initial_patch_stream_length = patch_stream->Length();
 
@@ -117,11 +117,13 @@ BSDiffStatus CreateBinaryPatch(SourceStream* old_stream,
     return MEM_ERROR;
   }
 
-  base::Time q_start_time = base::Time::Now();
+  //base::Time q_start_time = base::Time::Now();
   divsuf::saint_t result = divsuf::divsufsort_include_empty(
       old, I.begin(), oldsize);
+  /*
   VLOG(1) << " done divsufsort "
           << (base::Time::Now() - q_start_time).InSecondsF();
+	  */
   if (result != 0)
     return UNEXPECTED_ERROR;
 
@@ -342,8 +344,8 @@ BSDiffStatus CreateBinaryPatch(SourceStream* old_stream,
           << "  extra bytes: " << extra_bytes_length
           << "\nUncompressed bsdiff patch size "
           << patch_stream->Length() - initial_patch_stream_length
-          << "\nEnd bsdiff "
-          << (base::Time::Now() - start_bsdiff_time).InSecondsF();
+          << "\nEnd bsdiff ";
+          //<< (base::Time::Now() - start_bsdiff_time).InSecondsF();
 
   return OK;
 }

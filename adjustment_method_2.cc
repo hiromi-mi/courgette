@@ -19,7 +19,8 @@
 #include "base/logging.h"
 #include "base/macros.h"
 #include "base/strings/stringprintf.h"
-#include "base/time/time.h"
+// mini_chromum does not supprot
+//#include "base/time/time.h"
 #include "courgette/assembly_program.h"
 #include "courgette/courgette.h"
 #include "courgette/encoded_program.h"
@@ -1269,11 +1270,12 @@ class Adjuster : public AdjustmentMethod {
   }
 
   void Solve(const Trace& model, size_t model_end) {
-    base::Time start_time = base::Time::Now();
+	  // TODO mini_chromium does no support this
+    //base::Time start_time = base::Time::Now();
     AssignmentProblem a(model, model_end);
     a.Solve();
-    VLOG(1) << " Adjuster::Solve "
-            << (base::Time::Now() - start_time).InSecondsF();
+    //VLOG(1) << " Adjuster::Solve "
+    //        << (base::Time::Now() - start_time).InSecondsF();
   }
 
   void ReferenceLabel(Trace* trace, bool is_model, Label* label) {
